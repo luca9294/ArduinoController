@@ -26,17 +26,23 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
+import arduino.javaclasses.ConnectionManager;
+
+
+
 public class MainActivity extends AppCompatActivity {
 
+    private static final int BT_ENABLE_REQUEST = 10; // This is the code we use for BT Enable
     private static final String TAG = "BlueTest5-MainActivity";
     private int mMaxChars = 50000;//Default
-    private UUID mDeviceUUID;
     private BluetoothSocket mBTSocket;
     private boolean mIsUserInitiatedDisconnect = false;
     private boolean mIsBluetoothConnected = false;
     private BluetoothAdapter mBTAdapter;
     private List<BluetoothDevice> ls;
     private List<String> ls_string;
+    private int checked = 0;
+    private ConnectionManager cm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!isBluehtoothActive()){
                     showMsgBox("Error", "Bluetooth not enabled");
+                    Intent enableBT = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBT, BT_ENABLE_REQUEST);
                 }
                 else
                 {
@@ -80,47 +88,28 @@ public class MainActivity extends AppCompatActivity {
 
     private void showMsgBox(String title, String text){
         new AlertDialog.Builder(this)
-                .setTitle("Delete entry")
-                .setMessage("Are you sure you want to delete this entry?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // continue with delete
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // do nothing
-                    }
-                })
+                .setTitle(title)
+                .setMessage(text)
+                .setPositiveButton(android.R.string.ok, null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
     private void openCheckBoxesDialog()
     {
-        int checked = 0;
+
         final CharSequence[] dialogList=  ls_string.toArray(new CharSequence[ls_string.size()]);
         final AlertDialog.Builder builderDialog = new AlertDialog.Builder(MainActivity.this);
         builderDialog.setTitle("Paired Devices");
-        builderDialog.setSingleChoiceItems(dialogList, checked, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
+        builderDialog.setSingleChoiceItems(dialogList, checked, null);
+        cm = new ConnectionManager(ls.get(checked),this);
         builderDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+              cm.connectBtDevice();
             }
         });
-        builderDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
+        builderDialog.setNegativeButton("Cancel", null);
         AlertDialog alert = builderDialog.create();
         alert.show();
     }
