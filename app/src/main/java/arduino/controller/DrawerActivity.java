@@ -1,6 +1,10 @@
 package arduino.controller;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -12,14 +16,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import arduino.controller.BtConnectionService.LocalBinder;
 
-public class ActionActivity extends AppCompatActivity
+public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+
+    private BtConnectionService localService;
+    private boolean isBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_action);
+        setContentView(R.layout.activity_drawer);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -50,12 +60,13 @@ public class ActionActivity extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+        localService.disconnectBtDevice();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.action, menu);
+        getMenuInflater().inflate(R.menu.drawer, menu);
         return true;
     }
 
@@ -88,9 +99,6 @@ public class ActionActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 
@@ -98,4 +106,74 @@ public class ActionActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, BtConnectionService.class);
+        bindService(intent, connection, this.getApplicationContext().BIND_AUTO_CREATE);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isBound) {
+            //unbindService(connection);
+         //   isBound = false;
+        }
+        localService.disconnectBtDevice();
+    }
+
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder service) {
+            BtConnectionService.LocalBinder binder = (BtConnectionService.LocalBinder) service;
+            localService = binder.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+          //  isBound = false;
+        }
+    };
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+       if (localService != null) {
+           if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
+
+               localService.connectBtDevice();
+           }
+
+           if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
+               Intent intent = new Intent(this, MainActivity.class);
+               startActivity(intent);
+           }
+       }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        localService.disconnectBtDevice();
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        localService.disconnectBtDevice();
+    }
+
 }
+
+
+
+
+
+
+
+

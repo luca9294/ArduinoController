@@ -23,6 +23,7 @@
 
     <string name="pref_title_display_name">UUID</string>
     <string name="pref_default_display_name">00001101-0000-1000-8000-00805f9b34fb</string>
+    <string name="title_activity_drawer">Arduino Controller</string>
 
 
 </resources>

@@ -19,13 +19,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ActionActivity"
-            android:label="@string/title_activity_action"
-            android:theme="@android:style/Theme.Holo" />
-        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings" />
 
+        <service
+            android:name=".BtConnectionService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".DrawerActivity"
+            android:label="@string/title_activity_drawer"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
