@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,8 +18,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+
 import android.view.MenuItem;
-import arduino.controller.BtConnectionService.LocalBinder;
+
+import java.util.Timer;
 
 public class DrawerActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -24,7 +29,9 @@ public class DrawerActivity extends AppCompatActivity
 
     private BtConnectionService localService;
     private boolean isBound = false;
-
+    private Fragment fragment;
+    private boolean t = true;
+    private Timer myTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,7 @@ public class DrawerActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -72,7 +80,7 @@ public class DrawerActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
+        // Handle action bar item ccolicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
@@ -88,23 +96,39 @@ public class DrawerActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
+        displaySelectedScreen(item.getItemId());
+        //make this method blank
+        return true;
+    }
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+    private void displaySelectedScreen(int itemId) {
 
-        } else if (id == R.id.nav_slideshow) {
+        //creating fragment object
 
-        } else if (id == R.id.nav_manage) {
 
+        //initializing the fragment object which is selected
+        switch (itemId) {
+            case R.id.nav_temperature:
+                fragment = new TemperatureFragment();
+                break;
+        }
+        //replacing the fragment
+        if (fragment != null) {
+         /*   Bundle args = new Bundle();
+            String temp = localService.getString();
+            while (temp.length() == 0)
+                temp = localService.getString();
+            args.putString("t",temp);
+            fragment.setArguments(args);*/
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
 
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
-        return true;
+
     }
 
 
@@ -114,12 +138,13 @@ public class DrawerActivity extends AppCompatActivity
         Intent intent = new Intent(this, BtConnectionService.class);
         bindService(intent, connection, this.getApplicationContext().BIND_AUTO_CREATE);
     }
+
     @Override
     protected void onStop() {
         super.onStop();
         if (isBound) {
             //unbindService(connection);
-         //   isBound = false;
+            //   isBound = false;
         }
         localService.disconnectBtDevice();
     }
@@ -134,7 +159,7 @@ public class DrawerActivity extends AppCompatActivity
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-          //  isBound = false;
+            //  isBound = false;
         }
     };
 
@@ -142,17 +167,19 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-       if (localService != null) {
-           if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
+        if (localService != null) {
+            if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
 
-               localService.connectBtDevice();
-           }
+                localService.connectBtDevice();
+            }
 
-           if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
-               Intent intent = new Intent(this, MainActivity.class);
-               startActivity(intent);
-           }
-       }
+            if (localService.getActualState() == BtConnectionService.ConnectionState.DISCONNECTED) {
+                Intent intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
+            }
+
+
+        }
     }
 
     @Override
@@ -168,7 +195,20 @@ public class DrawerActivity extends AppCompatActivity
         localService.disconnectBtDevice();
     }
 
+    public BtConnectionService getLocalService(){
+
+        return localService;
+    }
+
+
+
+
+
+
+
 }
+
+
 
 
 

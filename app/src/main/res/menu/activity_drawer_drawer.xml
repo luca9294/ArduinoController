@@ -3,23 +3,23 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
+            android:id="@+id/nav_temperature"
+            android:icon="@drawable/ic_temperature"
             android:title="Temperature" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/nav_humidity"
             android:icon="@drawable/ic_menu_gallery"
             android:title="Humidity" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_brightness"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="Brightness" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/nav_controller"
             android:icon="@drawable/ic_menu_manage"
             android:title="Controller" />
         <item
-            android:id="@+id/nav_dashboard"
+            android:id="@+id/nav_dashboarb"
             android:icon="@drawable/ic_menu_manage"
             android:title="Dashboard" />
     </group>

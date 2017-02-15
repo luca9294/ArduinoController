@@ -1,0 +1,47 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="20dp"
+    tools:context="arduino.controller.TemperatureFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:layout_width="129dp"
+        android:layout_height="132dp"
+        android:inputType="textPersonName"
+        android:text="16°"
+        android:ems="10"
+        android:id="@+id/temperatureChelsius"
+        android:textSize="70sp"
+        android:textStyle="normal|bold"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="center_vertical|center"
+        android:layout_gravity="right" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="359dp"
+        app:srcCompat="@drawable/ic_celsius"
+        android:id="@+id/imageView"
+        android:layout_gravity="bottom"
+        tools:background="@android:color/background_light" />
+
+    <TextView
+        android:layout_width="135dp"
+        android:layout_height="132dp"
+        android:inputType="textPersonName"
+        android:text="16F"
+        android:ems="10"
+        android:id="@+id/textView2"
+        android:textSize="70sp"
+        android:textStyle="normal|bold"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="center_vertical|center"
+        android:layout_gravity="left" />
+
+</FrameLayout>
