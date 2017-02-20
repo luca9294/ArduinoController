@@ -1,11 +1,13 @@
 package arduino.controller;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AlertDialog;
@@ -37,12 +39,17 @@ public class MainActivity extends AppCompatActivity {
     private int checked = 0;
     private BtConnectionService localService;
     private boolean isBound = false;
-
+    private static final String MY_PREFS_NAME = "MyPrefsFile";
+    private Context context;
+    private ProgressDialog progressDialog;
+    private AlertDialog alert;
+    private SharedPreferences sharedpreferences;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context =this;
         setContentView(R.layout.fragment_main);
         mBTAdapter = BluetoothAdapter.getDefaultAdapter();
         ls = new ArrayList<BluetoothDevice>();
@@ -62,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
                         new SearchDevices().execute().get();
                         if (ls.size() == 0)
                             showMsgBox("Error", "Not device paired");
-                        else
-                            openCheckBoxesDialog();
+                        else{
+                            openCheckBoxesDialog();}
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     } catch (ExecutionException e) {
@@ -104,24 +111,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 localService.setBtDevice(ls.get(checked), c);
-              localService.connectBtDevice();
+                localService.connectBtDevice();
                 if (localService.getActualState() == BtConnectionService.ConnectionState.CONNECTED)
                 {
+                    SharedPreferences.Editor editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                    editor.putString("name", ls.get(checked).getName());
+                    editor.commit();
                     startActivity(intent1);
                 }
                 else{
-
-                    showMsgBox("Error", "Device not connected");
-                }
-
+                    showMsgBox("Error", "Device not connected");}
             }
         });
-
-
-
-
         builderDialog.setNegativeButton("Cancel", null);
-        AlertDialog alert = builderDialog.create();
+        alert = builderDialog.create();
         alert.show();
     }
 
@@ -152,7 +155,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private class SearchDevices extends AsyncTask<Void, Void, List<BluetoothDevice>> {
-
         @Override
         protected List<BluetoothDevice> doInBackground(Void... params) {
             Set<BluetoothDevice> pairedDevices = mBTAdapter.getBondedDevices();

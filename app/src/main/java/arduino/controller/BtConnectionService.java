@@ -33,6 +33,7 @@ public class BtConnectionService extends Service {
     private String strReceived = "";
     private boolean wStop = false;
     private boolean flag = false;
+    private ReadR r;
 
 
     public class LocalBinder extends Binder {
@@ -71,8 +72,6 @@ public class BtConnectionService extends Service {
             }
 
         }
-
-        new ReadR().execute();
     }
 
     //Disconnects the chosen Bluetooth Device
@@ -103,14 +102,15 @@ public class BtConnectionService extends Service {
 
     public void setWStop(boolean wStop) {
         this.wStop = wStop;
-
+        if (r == null && !wStop) {
+            r = new ReadR();
+            r.execute();
+        }
+        else if (!wStop && r.getStatus() == AsyncTask.Status.FINISHED){
+            r = new ReadR();
+            r.execute();
+        }
     }
-
-    public void startWriting(String command) {
-
-        new WriteInput(command);
-    }
-
 
     public String getString() {
         while (strReceived.equals("")) {
@@ -121,84 +121,6 @@ public class BtConnectionService extends Service {
         return temp;
     }
 
-    //A Thread that continuously reads some inputs
-    private class ReadInput implements Runnable {
-
-        private boolean bStop = false;
-        private Thread t;
-
-        public ReadInput() {
-            t = new Thread(this, "Input Thread");
-            t.start();
-        }
-
-        public boolean isRunning() {
-            return t.isAlive();
-        }
-
-        @Override
-        public void run() {
-            InputStream inputStream;
-            try {
-                inputStream = mBTSocket.getInputStream();
-                while (!bStop) {
-                    strReceived = "";
-                    byte[] buffer = new byte[256];
-                    if (inputStream.available() > 0) {
-                        inputStream.read(buffer);
-                        int i = 0;
-                        /*
-                         * This is needed because new String(buffer) is taking the entire buffer i.e. 256 chars on Android 2.3.4 http://stackoverflow.com/a/8843462/1287554
-						 */
-                        // for (i = 0; i < 4 && buffer[i] != 0; i++) {
-                        //}
-                        strReceived = "";
-                        String strInput = new String(buffer, 0, buffer.length);
-                        strInput = strInput.substring(0, 2);
-                        strReceived = strInput;
-                        strReceived = strReceived.replaceAll("\u0000.*", "");
-                    }
-
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-
-
-        public void stop() {
-            bStop = true;
-        }
-
-    }
-
-
-    //A Thread that continuously reads some inputs
-    public class WriteInput implements Runnable {
-        private Thread t;
-        private String command;
-
-        public WriteInput(String command) {
-            this.command = command;
-            t = new Thread(this, "Input Thread");
-            t.start();
-        }
-
-        public boolean isRunning() {
-            return t.isAlive();
-        }
-
-        @Override
-        public void run() {
-            InputStream inputStream;
-
-            while (strReceived.equals("")) {
-                writeString(command);
-            }
-
-        }
-    }
 
     private class ReadR extends AsyncTask<Void, Void, Void> {
 
@@ -209,10 +131,9 @@ public class BtConnectionService extends Service {
             try {
                 inputStream = mBTSocket.getInputStream();
                 String tempString = "";
-                while (true) {
+                while (!wStop) {
                     byte[] buffer = new byte[256];
                     if (inputStream.available() > 0) {
-
                         int temp = inputStream.available();
                         inputStream.read(buffer);
                         int i = 0;

@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="arduino.controller.ControllerFragment"
+    tools:background="@android:color/background_dark">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.32" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="154dp"
+            app:srcCompat="@drawable/android_logo"
+            android:id="@+id/imageView31" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.62" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            app:srcCompat="@drawable/arrow"
+            android:id="@+id/upBtn"
+            android:layout_height="42dp"
+            android:rotation="180"
+            android:layout_weight="0.01" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="104dp"
+            android:weightSum="1">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/arrow"
+                android:id="@+id/leftBtn"
+                android:rotation="90" />
+
+            <Space
+                android:layout_width="254dp"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/arrow"
+                android:id="@+id/rightBtn"
+                android:layout_gravity="right"
+                android:rotation="-90"
+                android:layout_width="64dp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            app:srcCompat="@drawable/arrow"
+            android:id="@+id/downBtn"
+            android:layout_height="92px"
+            android:layout_weight="0.00"
+            android:rotation="0" />
+    </LinearLayout>
+</RelativeLayout>

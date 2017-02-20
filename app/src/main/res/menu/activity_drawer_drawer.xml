@@ -8,19 +8,19 @@
             android:title="Temperature" />
         <item
             android:id="@+id/nav_humidity"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@drawable/ic_humidity"
             android:title="Humidity" />
         <item
             android:id="@+id/nav_brightness"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_brightness"
             android:title="Brightness" />
         <item
             android:id="@+id/nav_controller"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_controller"
             android:title="Controller" />
         <item
             android:id="@+id/nav_dashboarb"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/ic_console"
             android:title="Dashboard" />
     </group>
 

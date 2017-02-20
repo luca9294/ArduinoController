@@ -51,11 +51,12 @@ public class TemperatureFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_temperature, container, false);
+        localService.setWStop(false);
         localService.writeString("t");
         String st =  localService.getString();
         tx = (TextView) v.findViewById(R.id.temperatureChelsius);
         tx.setText(st);
-
+        localService.setWStop(true);
         return v;
     }
 
