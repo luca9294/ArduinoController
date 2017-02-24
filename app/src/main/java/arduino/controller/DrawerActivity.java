@@ -38,6 +38,7 @@ public class DrawerActivity extends AppCompatActivity
     private boolean t = true;
     private Timer myTimer;
     private Context context;
+    private int itemId = 0;
     private SharedPreferences sharedpreferences;
     private static final String MY_PREFS_NAME = "MyPrefsFile";
     private boolean flag = false;
@@ -49,15 +50,6 @@ public class DrawerActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -72,6 +64,7 @@ public class DrawerActivity extends AppCompatActivity
         View navHeaderView= navigationView.getHeaderView(0);
         TextView tx = (TextView) navHeaderView.findViewById(R.id.deviceStr);
         tx.setText(restoredText);
+
 
     }
 
@@ -105,6 +98,43 @@ public class DrawerActivity extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.action__refresh){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.detach(fragment);
+
+            switch (itemId) {
+                case R.id.nav_temperature:
+                    fragment = new TemperatureFragment();
+                    localService.setWStop(false);
+                    break;
+                case R.id.nav_controller:
+                    fragment = new ControllerFragment();
+                    localService.setWStop(false);
+                    break;
+                case R.id.nav_brightness:
+                    fragment = new BrightnessFragment();
+                    localService.setWStop(false);
+                    break;
+                case R.id.nav_humidity:
+                    fragment = new HumidityFragment();
+                    localService.setWStop(false);
+                    break;
+                case R.id.nav_command:
+                    fragment = new CommandsFragment();
+                    localService.setWStop(true);
+                    break;
+
+            }
+
+
+            ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+            return true;
+        }
+
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -120,7 +150,7 @@ public class DrawerActivity extends AppCompatActivity
 
         //creating fragment object
 
-
+        this.itemId = itemId;
         //initializing the fragment object which is selected
         switch (itemId) {
             case R.id.nav_temperature:
@@ -129,6 +159,22 @@ public class DrawerActivity extends AppCompatActivity
                 break;
             case R.id.nav_controller:
                 fragment = new ControllerFragment();
+                localService.setWStop(false);
+                break;
+            case R.id.nav_brightness:
+                fragment = new BrightnessFragment();
+                localService.setWStop(false);
+                break;
+            case R.id.nav_humidity:
+                fragment = new HumidityFragment();
+                localService.setWStop(false);
+                break;
+            case R.id.nav_command:
+                fragment = new CommandsFragment();
+                localService.setWStop(true);
+                break;
+            case R.id.nav_dashboarb:
+                fragment = new DashboardFragment();
                 localService.setWStop(false);
                 break;
 
@@ -149,12 +195,17 @@ public class DrawerActivity extends AppCompatActivity
         super.onStart();
         if (localService == null){
         Intent intent = new Intent(this, BtConnectionService.class);
-        bindService(intent, connection, this.getApplicationContext().BIND_AUTO_CREATE);}
+        bindService(intent, connection, this.getApplicationContext().BIND_AUTO_CREATE);
+
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        localService.setWStop(false);
+        localService.writeString("y");
+        localService.setWStop(true);
         if (isBound) {
             //unbindService(connection);
             //   isBound = false;
@@ -168,6 +219,10 @@ public class DrawerActivity extends AppCompatActivity
             BtConnectionService.LocalBinder binder = (BtConnectionService.LocalBinder) service;
             localService = binder.getService();
             isBound = true;
+            fragment = new ControllerFragment();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
         }
 
         @Override
@@ -201,6 +256,9 @@ public class DrawerActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
+        localService.setWStop(false);
+        localService.writeString("y");
+        localService.setWStop(true);
         localService.disconnectBtDevice();
     }
 

@@ -1,12 +1,16 @@
 package arduino.controller;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 
 /**
@@ -18,16 +22,14 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class CommandsFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
+    private EditText edTemp;
+    private EditText etBright;
+    private EditText etHum;
+    private EditText etUp;
+    private EditText etDown;
+    private EditText etLeft;
+    private EditText etRight;
 
     public CommandsFragment() {
         // Required empty public constructor
@@ -45,8 +47,6 @@ public class CommandsFragment extends Fragment {
     public static CommandsFragment newInstance(String param1, String param2) {
         CommandsFragment fragment = new CommandsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,41 +54,38 @@ public class CommandsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        View v = inflater.inflate(R.layout.fragment_commands, container, false);
+         edTemp   = (EditText) v.findViewById(R.id.etTemp);
+         etBright = (EditText) v.findViewById(R.id.etBright);
+         etHum    = (EditText) v.findViewById(R.id.etHum);
+         etUp     = (EditText) v.findViewById(R.id.etUp);
+         etDown   = (EditText) v.findViewById(R.id.etDown);
+         etLeft   = (EditText) v.findViewById(R.id.etLeft);
+         etRight  = (EditText) v.findViewById(R.id.etRight);
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("Commands", 0);
+        if (prefs == null)
+          initializeDefaultValues(v);
+        else
+            initializeSavedValues(v);
+
+        Button saveBtn = (Button) v.findViewById(R.id.saveBtn);
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateValues(v);
+            }
+        });
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_commands, container, false);
-    }
+        return v;
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     /**
@@ -104,5 +101,54 @@ public class CommandsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    //Sets the values in the SharedPreferences
+    private void initializeDefaultValues(View v){
+        edTemp.setText("t");
+        etBright.setText("b");
+        etHum.setText("h");
+        etUp.setText("u");
+        etDown.setText("d");
+        etLeft.setText("l");
+        etRight.setText("r");
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("Commands", 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("edTemp",   "t");
+        editor.putString("etBright", "b");
+        editor.putString("etHum",    "h");
+        editor.putString("etUp",     "u");
+        editor.putString("etDown",   "d");
+        editor.putString("etLeft",   "l");
+        editor.putString("etRight",  "r");
+        editor.commit();
+    }
+
+    //Sets the values saved in the SharedPreferences
+    private void initializeSavedValues(View v){
+        SharedPreferences prefs = getActivity().getSharedPreferences("Commands", 0);
+        edTemp .setText(prefs.getString("edTemp","empty"));
+        etBright.setText(prefs.getString("etBright","empty"));
+        etHum.setText(prefs.getString("etHum","empty"));
+        etUp.setText(prefs.getString("etUp","empty"));
+        etDown.setText(prefs.getString("etDown","empty"));
+        etLeft.setText(prefs.getString("etLeft","empty"));
+        etRight.setText(prefs.getString("etRight","empty"));
+    }
+
+
+    //Saves the values in the SharedPreferences
+    private void updateValues(View v){
+        SharedPreferences prefs = getActivity().getSharedPreferences("Commands", 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("edTemp", edTemp.getText().toString());
+        editor.putString("etBright", etBright.getText().toString());
+        editor.putString("etHum", etHum.getText().toString());
+        editor.putString("etUp", etUp.getText().toString());
+        editor.putString("etDown", etDown.getText().toString());
+        editor.putString("etLeft", etLeft.getText().toString());
+        editor.putString("etRight", etRight.getText().toString());
+        editor.commit();
     }
 }

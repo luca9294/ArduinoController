@@ -113,8 +113,13 @@ public class BtConnectionService extends Service {
     }
 
     public String getString() {
-        while (strReceived.equals("")) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        // / while (strReceived.equals("")) {
+        //}
         String temp = strReceived;
         strReceived = "";
 
